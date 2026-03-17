@@ -1,0 +1,8 @@
+# Copy to application-local.properties and fill in real values
+# Run with: ./gradlew bootRun --args='--spring.profiles.active=local'
+azure.speech.key=your_azure_speech_key_here
+azure.region=eastasia
+azure.translator.key=your_azure_translator_key_here
+azure.translator.region=eastasia
+supabase.url=https://xxxxx.supabase.co
+supabase.service.key=eyJhbGci...

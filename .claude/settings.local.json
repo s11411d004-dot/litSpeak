@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"D:/claudeCode/litSpeak_server\" && gradle wrapper --gradle-version 8.12 2>&1)",
+      "Bash(curl -sL -o \"D:/claudeCode/litSpeak_server/gradle/wrapper/gradle-wrapper.jar\" \"https://raw.githubusercontent.com/gradle/gradle/v8.12.0/gradle/wrapper/gradle-wrapper.jar\" 2>&1 && ls -la \"D:/claudeCode/litSpeak_server/gradle/wrapper/gradle-wrapper.jar\")",
+      "Bash(chmod +x \"D:/claudeCode/litSpeak_server/gradlew\")",
+      "Bash(cd D:/claudeCode/litSpeak_server && ./gradlew build -x test 2>&1)",
+      "Bash(where java:*)",
+      "Read(//c/Program Files/Java/**)",
+      "Read(//c/Program Files/**)",
+      "Read(//d/claudeCode/litSpeak_server/$HOME/**)",
+      "Bash(reg query:*)",
+      "Bash(curl -L -o /tmp/jdk17.zip \"https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.zip\" 2>&1 | tail -5)",
+      "Read(//tmp/**)",
+      "Bash(unzip -q -o /tmp/jdk17.zip -d \"C:/Program Files/Java/\")",
+      "Bash(unzip -q -o /tmp/jdk17.zip -d \"$HOME/jdk17\")",
+      "Bash(echo $HOME && echo $USERPROFILE)",
+      "Bash(mkdir -p /c/Users/User/jdk17)",
+      "Bash(unzip -q -o /tmp/jdk17.zip -d /c/Users/User/jdk17/)",
+      "Bash(/c/Users/User/jdk17/jdk-17.0.12/bin/java -version 2>&1)",
+      "Bash(cd D:/claudeCode/litSpeak_server && JAVA_HOME=\"/c/Users/User/jdk17/jdk-17.0.12\" ./gradlew build -x test 2>&1)"
+    ]
+  }
+}
