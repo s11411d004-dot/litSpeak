@@ -34,6 +34,17 @@ public class AssessmentService {
 
     public Map<String, Object> assess(byte[] audioData, String referenceText) {
         try {
+            log.info("Assessment request: referenceText='{}', audioSize={} bytes", referenceText, audioData.length);
+
+            // Log first few bytes to verify audio format (WAV should start with "RIFF")
+            if (audioData.length >= 4) {
+                String header = new String(audioData, 0, 4, java.nio.charset.StandardCharsets.ISO_8859_1);
+                log.info("Audio header bytes: [{}] (expected 'RIFF' for WAV format)", header);
+                if (!"RIFF".equals(header)) {
+                    log.warn("Audio does NOT appear to be WAV format! Header: [{}]. This may cause Azure to return 0 scores.", header);
+                }
+            }
+
             // Build pronunciation assessment config
             String assessmentConfig = Base64.getEncoder().encodeToString(
                     objectMapper.writeValueAsBytes(Map.of(
@@ -43,6 +54,8 @@ public class AssessmentService {
                             "Dimension", "Comprehensive"
                     ))
             );
+
+            log.debug("Assessment config (decoded): ReferenceText='{}', GradingSystem=HundredMark, Granularity=Phoneme, Dimension=Comprehensive", referenceText);
 
             String url = "https://" + region + ".stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1"
                     + "?language=en-US";
@@ -64,6 +77,7 @@ public class AssessmentService {
                 }
 
                 String responseBody = response.body().string();
+                log.info("Azure Assessment raw response: {}", responseBody);
                 JsonNode root = objectMapper.readTree(responseBody);
                 return parseAssessmentResult(root);
             }
@@ -76,7 +90,17 @@ public class AssessmentService {
     private Map<String, Object> parseAssessmentResult(JsonNode root) {
         Map<String, Object> result = new HashMap<>();
 
+        // Log RecognitionStatus to check if Azure recognized the audio
+        String recognitionStatus = root.path("RecognitionStatus").asText("N/A");
+        log.info("Azure RecognitionStatus: {}", recognitionStatus);
+        if (!"Success".equals(recognitionStatus)) {
+            log.warn("RecognitionStatus is '{}', not 'Success'. Audio may not have been recognized properly.", recognitionStatus);
+        }
+
         JsonNode nBest = root.path("NBest");
+        if (!nBest.isArray() || nBest.isEmpty()) {
+            log.warn("NBest array is missing or empty in Azure response. Returning empty scores.");
+        }
         if (nBest.isArray() && nBest.size() > 0) {
             JsonNode best = nBest.get(0);
             JsonNode pronAssessment = best.path("PronunciationAssessment");
