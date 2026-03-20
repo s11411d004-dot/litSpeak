@@ -110,15 +110,12 @@ public class AssessmentService {
         }
         if (nBest.isArray() && nBest.size() > 0) {
             JsonNode best = nBest.get(0);
-            JsonNode pronAssessment = best.path("PronunciationAssessment");
 
-            double overallScore = pronAssessment.path("PronScore").asDouble(0);
-            result.put("overall_score", Math.round(overallScore));
-
-            // accuracy, fluency, completeness scores
-            result.put("accuracy_score", Math.round(pronAssessment.path("AccuracyScore").asDouble(0)));
-            result.put("fluency_score", Math.round(pronAssessment.path("FluencyScore").asDouble(0)));
-            result.put("completeness_score", Math.round(pronAssessment.path("CompletenessScore").asDouble(0)));
+            // Scores are directly on the NBest object, not nested under PronunciationAssessment
+            result.put("overall_score", Math.round(best.path("PronScore").asDouble(0)));
+            result.put("accuracy_score", Math.round(best.path("AccuracyScore").asDouble(0)));
+            result.put("fluency_score", Math.round(best.path("FluencyScore").asDouble(0)));
+            result.put("completeness_score", Math.round(best.path("CompletenessScore").asDouble(0)));
 
             List<Map<String, Object>> wordScores = new ArrayList<>();
             JsonNode words = best.path("Words");
@@ -126,8 +123,7 @@ public class AssessmentService {
                 for (JsonNode word : words) {
                     Map<String, Object> wordScore = new HashMap<>();
                     wordScore.put("word", word.path("Word").asText());
-                    JsonNode wordAssessment = word.path("PronunciationAssessment");
-                    wordScore.put("score", Math.round(wordAssessment.path("AccuracyScore").asDouble(0)));
+                    wordScore.put("score", Math.round(word.path("AccuracyScore").asDouble(0)));
 
                     List<Map<String, Object>> phonemes = new ArrayList<>();
                     JsonNode phonemeNodes = word.path("Phonemes");
@@ -135,7 +131,7 @@ public class AssessmentService {
                         for (JsonNode ph : phonemeNodes) {
                             Map<String, Object> phoneme = new HashMap<>();
                             phoneme.put("phoneme", ph.path("Phoneme").asText());
-                            phoneme.put("score", Math.round(ph.path("PronunciationAssessment").path("AccuracyScore").asDouble(0)));
+                            phoneme.put("score", Math.round(ph.path("AccuracyScore").asDouble(0)));
                             phonemes.add(phoneme);
                         }
                     }
