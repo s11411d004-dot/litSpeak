@@ -34,6 +34,13 @@ public class AssessmentService {
 
     public Map<String, Object> assess(byte[] audioData, String referenceText) {
         try {
+            // Strip surrounding quotes if present (e.g. "Do not..." → Do not...)
+            referenceText = referenceText.strip();
+            if (referenceText.length() >= 2
+                    && referenceText.startsWith("\"") && referenceText.endsWith("\"")) {
+                referenceText = referenceText.substring(1, referenceText.length() - 1).strip();
+            }
+
             log.info("Assessment request: referenceText='{}', audioSize={} bytes", referenceText, audioData.length);
 
             // Log first few bytes to verify audio format (WAV should start with "RIFF")
@@ -58,7 +65,7 @@ public class AssessmentService {
             log.debug("Assessment config (decoded): ReferenceText='{}', GradingSystem=HundredMark, Granularity=Phoneme, Dimension=Comprehensive", referenceText);
 
             String url = "https://" + region + ".stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1"
-                    + "?language=en-US";
+                    + "?language=en-US&format=detailed";
 
             Request request = new Request.Builder()
                     .url(url)
